@@ -32,7 +32,7 @@ export default function BusinessListByCategory() {
 
     const businessArray = [];
     querySnapshot.forEach((doc) => {
-      businessArray.push(doc.data());
+      businessArray.push({id:doc.id , ...doc.data()});
     });
     setBusinessList(businessArray);
     setLoading(false)
