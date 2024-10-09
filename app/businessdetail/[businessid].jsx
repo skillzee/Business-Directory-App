@@ -7,6 +7,7 @@ import { Colors } from '../../constants/Colors';
 import Intro from '../../components/BusinessDetail/Intro';
 import ActionButton from '../../components/BusinessDetail/ActionButton';
 import About from '../../components/BusinessDetail/About';
+import Reviews from '../../components/BusinessDetail/Reviews';
 
 export default function BusinessId() {
 
@@ -18,7 +19,7 @@ export default function BusinessId() {
         setLoading(true);
         const docRef = doc(db, "BusinessList", businessid)
         const docSnap = await getDoc(docRef);
-        setBusinessDetail(docSnap.data());
+        setBusinessDetail({id: docSnap.id, ...docSnap.data()});
         setLoading(false);
     }
 
@@ -42,6 +43,8 @@ export default function BusinessId() {
                 <ActionButton business={businessdetail}/>
                 {/* About Section */}
                 <About business={businessdetail}/>
+                {/* Review Section */}
+                <Reviews business={businessdetail}/>
             </View>
             }
         </ScrollView>
