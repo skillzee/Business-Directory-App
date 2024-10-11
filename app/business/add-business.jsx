@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, ToastAndroid, ActivityIndicator } from 'react-native'
+import { View, Text, Image, TextInput, ToastAndroid, ActivityIndicator, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from 'expo-router'
 import { Colors } from '../../constants/Colors';
@@ -65,22 +65,27 @@ export default function AddBusiness() {
 
     const onAddNewBusiness= async()=>{
         setLoading(true)
-        const fileName = Date.now().toString()+".jpg";
-        const resp = await fetch(image);
-        const blob = await resp.blob();
-
-        const imageRef = ref(storage, 'business-app/'+fileName);
-
-        uploadBytes(imageRef, blob).then((snapShot)=>{
-            console.log("File Uploaded...");
+        
+        try {
+            const fileName = Date.now().toString()+".jpg";
+            const resp = await fetch(image);
+            const blob = await resp.blob();
+            const imageRef = ref(storage, 'business-app/'+fileName);
             
-        }).then(resp=>{
-            getDownloadURL(imageRef).then(async(dowloadurl)=>{
-                console.log(dowloadurl);
-                saveBusinessDetail(dowloadurl)
-            })
-        })
-        setLoading(false)
+            const snapShot = await uploadBytes(imageRef, blob);
+            console.log("File Uploaded...");
+    
+            const downloadUrl = await getDownloadURL(imageRef);
+            console.log(downloadUrl);
+    
+            await saveBusinessDetail(downloadUrl);
+    
+            ToastAndroid.show('New Business Added...', ToastAndroid.LONG);
+        } catch (error) {
+            console.error("Error uploading or saving business:", error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     const saveBusinessDetail = async(imageUrl)=>{
@@ -97,12 +102,12 @@ export default function AddBusiness() {
             imgUrl: imageUrl
         })
 
-        setLoading(false);
+        // setLoading(false);
         ToastAndroid.show('New Business Added...', ToastAndroid.LONG)
     }
 
     return (
-        <View style={{
+        <ScrollView style={{
             padding: 20
         }}>
             <Text style={{
@@ -238,6 +243,12 @@ export default function AddBusiness() {
             }   
             </TouchableOpacity>
 
-        </View>
+            <View style={{
+                height: 50
+            }}>
+
+            </View>
+
+        </ScrollView>
     )
 }
